@@ -24,6 +24,21 @@ export type SearchConfig = {
 };
 
 /**
+ * 搜索结果解析状态
+ */
+export enum ESearchResultParseStatus {
+  success = "success",
+  needLogin = "needLogin",
+  noTorrents = "noTorrents",
+  torrentTableIsEmpty = "torrentTableIsEmpty",
+  parseError = "parseError"
+}
+
+Object.assign(window, {
+  ESearchResultParseStatus
+});
+
+/**
  * 搜索类
  */
 export class Searcher {
@@ -82,7 +97,12 @@ export class Searcher {
       }
 
       if (!searchConfig.entry) {
-        result.msg = `该站点[${site.name}]未配置搜索页面，请先配置`;
+        result.msg = this.service.i18n.t(
+          "service.searcher.siteSearchConfigEntryIsEmpty",
+          {
+            site
+          }
+        ); //`该站点[${site.name}]未配置搜索页面，请先配置`;
         result.type = EDataResultType.error;
         reject(result);
         console.log("searchTorrent: tip");
@@ -138,6 +158,7 @@ export class Searcher {
           entry.resultType = entry.resultType || searchEntryConfig.resultType;
           entry.resultSelector =
             entry.resultSelector || searchEntryConfig.resultSelector;
+          entry.headers = entry.headers || searchEntryConfig.headers;
         }
 
         // 判断是否指定了搜索页和用于获取搜索结果的脚本
@@ -264,7 +285,12 @@ export class Searcher {
 
       // 没有指定搜索入口
       if (entryCount == 0) {
-        result.msg = `该站点[${site.name}]未指定搜索页面，请先指定一个搜索入口`;
+        result.msg = this.service.i18n.t(
+          "service.searcher.siteSearchEntryIsEmpty",
+          {
+            site
+          }
+        ); //`该站点[${site.name}]未指定搜索页面，请先指定一个搜索入口`;
         result.type = EDataResultType.error;
         reject(result);
       }
@@ -292,7 +318,8 @@ export class Searcher {
         url: url,
         dataType: "text",
         contentType: "text/plain",
-        timeout: (this.options.search && this.options.search.timeout) || 30000
+        timeout: (this.options.search && this.options.search.timeout) || 30000,
+        headers: entry.headers
       })
         .done((result: any) => {
           console.log("getSearchResult.done", url);
@@ -318,7 +345,12 @@ export class Searcher {
             } catch (error) {
               reject({
                 success: false,
-                msg: `[${site.name}]数据解析失败！`
+                msg: this.service.i18n.t(
+                  "service.searcher.siteSearchResultParseFailed",
+                  {
+                    site
+                  }
+                ) //`[${site.name}]数据解析失败！`
               });
               return;
             }
@@ -332,7 +364,8 @@ export class Searcher {
               entry,
               torrentTagSelectors: torrentTagSelectors,
               errorMsg: "",
-              isLogged: false
+              isLogged: false,
+              status: ESearchResultParseStatus.success
             };
 
             // 执行获取结果的脚本
@@ -340,10 +373,17 @@ export class Searcher {
               if (entry.parseScript) {
                 eval(entry.parseScript);
               }
-              if (options.errorMsg) {
+              if (
+                options.errorMsg ||
+                options.status != ESearchResultParseStatus.success
+              ) {
                 reject({
                   success: false,
-                  msg: options.errorMsg,
+                  msg: this.getErrorMessage(
+                    site,
+                    options.status,
+                    options.errorMsg
+                  ),
                   data: {
                     site,
                     isLogged: options.isLogged
@@ -356,13 +396,23 @@ export class Searcher {
               console.error(error);
               reject({
                 success: false,
-                msg: `[${site.name}]脚本执行出错！`
+                msg: this.service.i18n.t(
+                  "service.searcher.siteEvalScriptFailed",
+                  {
+                    site
+                  }
+                ) //`[${site.name}]脚本执行出错！`
               });
             }
           } else {
             reject({
               success: false,
-              msg: `[${site.name}]没有返回预期的数据。`
+              msg: this.service.i18n.t(
+                "service.searcher.siteSearchResultError",
+                {
+                  site
+                }
+              ) //`[${site.name}]没有返回预期的数据。`
             });
           }
         })
@@ -372,6 +422,24 @@ export class Searcher {
           reject(result);
         });
     });
+  }
+
+  /**
+   * 根据错误代码获取错误信息
+   * @param code
+   */
+  public getErrorMessage(
+    site: Site,
+    status: ESearchResultParseStatus = ESearchResultParseStatus.success,
+    msg: string = ""
+  ): string {
+    if (status != ESearchResultParseStatus.success) {
+      return this.service.i18n.t(`contentPage.search.${status}`, {
+        siteName: site.name,
+        msg
+      });
+    }
+    return msg;
   }
 
   /**
@@ -388,7 +456,9 @@ export class Searcher {
         this.service.logger.add({
           module: EModule.background,
           event: "searcher.abortSearch",
-          msg: `正在取消[${site.host}]的搜索请求`,
+          msg: this.service.i18n.t("service.searcher.siteAbortSearch", {
+            site
+          }), //`正在取消[${site.host}]的搜索请求`,
           data: {
             site: site.host,
             key: key
@@ -422,7 +492,12 @@ export class Searcher {
                 this.service.logger.add({
                   module: EModule.background,
                   event: "searcher.abortSearch.error",
-                  msg: "取消搜索请求失败",
+                  msg: this.service.i18n.t(
+                    "service.searcher.siteAbortSearchError",
+                    {
+                      site
+                    }
+                  ), // "取消搜索请求失败",
                   data: {
                     site: site.host,
                     key: key,

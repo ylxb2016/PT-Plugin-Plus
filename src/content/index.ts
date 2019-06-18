@@ -17,6 +17,7 @@ import {
 import { APP } from "@/service/api";
 import { filters } from "@/service/filters";
 import { PathHandler } from "@/service/pathHandler";
+import i18n from "i18next";
 
 /**
  * 插件背景脚本，会插入到每个页面
@@ -59,6 +60,8 @@ class PTPContent {
   public locationURL: string = location.href;
   // 保存路径处理器
   public pathHandler: PathHandler = new PathHandler();
+  // 多语言处理器
+  public i18n = i18n;
 
   constructor() {
     this.extension = new Extension();
@@ -71,7 +74,7 @@ class PTPContent {
   private readConfig() {
     this.extension.sendRequest(EAction.readConfig, (result: any) => {
       this.options = result;
-      this.init();
+      this.initI18n();
     });
   }
 
@@ -83,6 +86,32 @@ class PTPContent {
     setInterval(() => {
       this.checkLocationURL();
     }, 1000);
+  }
+
+  /**
+   * 初始化多语言环境
+   */
+  private initI18n() {
+    this.extension
+      .sendRequest(EAction.getCurrentLanguageResource, null, "contentPage")
+      .then(resource => {
+        // console.log(resource);
+        let locale = this.options.locale || "en";
+        // 初始化
+        i18n.init({
+          lng: locale,
+          interpolation: {
+            prefix: "{",
+            suffix: "}"
+          },
+          resources: {
+            [locale]: {
+              translation: resource
+            }
+          }
+        });
+        this.init();
+      });
   }
 
   /**
@@ -117,6 +146,9 @@ class PTPContent {
    * 初始化符合条件的附加页面
    */
   private initPages() {
+    if (!this.options.showToolbarOnContentPage) {
+      return;
+    }
     // 判断当前页面的所属站点是否已经被定义
     this.site = this.getSiteFromHost(window.location.hostname);
 
@@ -161,8 +193,9 @@ class PTPContent {
       // 获取符合当前网站所需要的附加脚本
       this.schema.plugins.forEach((plugin: Plugin) => {
         let index = plugin.pages.findIndex((page: string) => {
+          let fullpath = window.location.href;
           let path = window.location.pathname;
-          let indexOf = path.indexOf(page);
+          let indexOf = fullpath.indexOf(page);
           // 如果页面不包含，则使用正则尝试
           if (indexOf === -1) {
             return new RegExp(page, "").test(path);
@@ -312,7 +345,7 @@ class PTPContent {
     return new Promise<any>((resolve?: any, reject?: any) => {
       if (this.backgroundServiceIsStoped) {
         reject({
-          msg: "插件已被禁用过重启过，请刷新页面后再重试"
+          msg: i18n.t("backgroundServiceIsStoped") //"插件已被禁用过重启过，请刷新页面后再重试"
         });
         return;
       }
@@ -330,7 +363,12 @@ class PTPContent {
             reject(result);
           });
       } catch (error) {
-        this.showNotice(`${action} 执行出错，可能后台服务不可用`);
+        //`${action} 执行出错，可能后台服务不可用`
+        this.showNotice(
+          i18n.t("actionExecutionFailed", {
+            action
+          })
+        );
         reject(error);
       }
     });
@@ -346,7 +384,7 @@ class PTPContent {
     }
     this.buttonBar = $("<div class='pt-plugin-body'/>").appendTo(document.body);
     this.logo = $(
-      "<div class='logo' title='PT助手 - 点击打开配置页'/>"
+      "<div class='logo' title='" + i18n.t("pluginTitle") + "'/>"
     ).appendTo(this.buttonBar);
     this.logo.on("click", () => {
       this.call(EAction.openOptions);
@@ -426,7 +464,11 @@ class PTPContent {
             }
             inner.show();
             this.showNotice({
-              msg: error || `${options.label} 发生错误，请重试。`
+              msg:
+                error ||
+                i18n.t("callbackFailed", {
+                  label: options.label
+                }) // `${options.label} 发生错误，请重试。`
             });
           },
           event
@@ -632,7 +674,7 @@ class PTPContent {
               } else {
                 this.showNotice({
                   type: EDataResultType.info,
-                  msg: "当前页面不支持此操作",
+                  msg: i18n.t("notSupported"), // "当前页面不支持此操作",
                   timeout: 3
                 });
                 this.logo.removeClass("onLoading");
@@ -685,8 +727,6 @@ class PTPContent {
    */
   public checkLocationURL() {
     if (location.href != this.locationURL) {
-      APP.debugMode &&
-        console.log(`地址变化：${this.locationURL} -> ${location.href}`);
       this.locationURL = location.href;
       this.initPages();
     }

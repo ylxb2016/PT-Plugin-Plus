@@ -76,7 +76,8 @@ class Config {
       getMovieInformation: true,
       maxMovieInformationCount: 5,
       searchModeForItem: EBeforeSearchingItemSearchMode.id
-    }
+    },
+    showToolbarOnContentPage: true
   };
 
   public uiOptions: UIOptions = {};
@@ -114,7 +115,8 @@ class Config {
             "patterns",
             "torrentTagSelectors",
             "icon",
-            "activeURL"
+            "activeURL",
+            "searchEntryConfig"
           ].forEach((key: string) => {
             let _item = item as any;
             if (_item[key]) {
@@ -205,6 +207,11 @@ class Config {
       }
       let defaultOptions = Object.assign({}, this.options);
       this.options = Object.assign(defaultOptions, options);
+    }
+
+    // 如果未指定语言，则以当前浏览器默认语言为准
+    if (!this.options.locale) {
+      this.options.locale = navigator.language || "zh-CN";
     }
 
     // 覆盖站点架构

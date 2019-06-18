@@ -268,5 +268,4 @@ export const APP = {
 };
 
 APP.cache.init();
-
 export const API = RESOURCE_API;

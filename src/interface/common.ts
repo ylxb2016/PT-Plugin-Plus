@@ -106,6 +106,10 @@ export interface Options {
   showMoiveInfoCardOnSearch?: boolean;
   // 在搜索之前一些选项配置
   beforeSearchingOptions?: BeforeSearching;
+  // 在页面中显示工具栏
+  showToolbarOnContentPage?: boolean;
+  // 当前语言
+  locale?: string;
 }
 
 // 在搜索之前一些选项配置
@@ -194,6 +198,9 @@ export interface Site {
   path?: string;
   // 曾用域名列表，用于数据升级
   formerHosts?: string[];
+  // 离线，设置为true时，不再进行搜索和个人信息获取，保存原数据统计
+  // todo: 后续可根据站点返回的状态码自动设置为离线
+  offline?: boolean;
 }
 
 export interface Request {
@@ -303,6 +310,7 @@ export interface SearchEntryConfig {
   parseScript?: string;
   resultSelector?: string;
   area?: SearchEntryConfigArea[];
+  headers?: Dictionary<any>;
 }
 
 export interface SearchEntry {
@@ -319,6 +327,7 @@ export interface SearchEntry {
   queryString?: string;
   categories?: string[];
   appendToSearchKeyString?: string;
+  headers?: Dictionary<any>;
 }
 
 export interface UIOptions {
