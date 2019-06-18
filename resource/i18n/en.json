@@ -7,7 +7,7 @@
   "words": {
     "app": {
       "initError": "The configuration information failed to be loaded. The system definition information was not obtained. Please try to refresh the current page.",
-      "initializing": "The program is preparing some data, please wait...",
+      "initializing": "The data is being prepared, please wait...",
       "author": "ronggang",
       "name": "PT Plugin Plus"
     },
@@ -17,7 +17,7 @@
       "version": "Version",
       "systemLog": "System Log",
       "haveNewReleases": "Update available",
-      "add": "New",
+      "add": "Add",
       "edit": "Edit",
       "copy": "Copy",
       "ok": "OK",
@@ -34,8 +34,8 @@
       "navBarTip": "Click to show\/hide the navigation bar",
       "help": "Wiki",
       "github": "Github",
-      "showNewTorrents": "Get the first page of each station",
-      "showNewTorrentsTip": "Search the first page torrents of each station according to the current solution"
+      "showNewTorrents": "Get the first page of each tracker",
+      "showNewTorrentsTip": "Search the first page torrents of each tracker according to the current solution"
     },
     "navigation": {
       "dashboard": {
@@ -66,14 +66,14 @@
     },
     "permissions": {
       "title": "Thank you for choosing PT Plugin Plus",
-      "subtitle": "Please authorize the required features to avoid affecting normal use.",
+      "subtitle": "In order to work properly, please authorize the required permission.",
       "authorize": "Authorization",
       "cancel": "Cancel",
       "cancelled": "Bye!",
       "details": {
-        "allSites": "Access to all websites for searching and get torrent data;",
+        "allSites": "Access to all trackers for searching and get torrents data;",
         "tabs": "Read permission of the activity tab to display the PT Plugin Plus icon;",
-        "downloads": "Download permission for batch download of torrent files"
+        "downloads": "Download permission for batch download of torrents"
       },
       "headers": {
         "title": "Permission description",
@@ -81,14 +81,14 @@
       }
     },
     "searchBox": {
-      "searchTip": "Input keyword, IMDb number, press Enter to search",
+      "searchTip": "Input keyword, IMDb numbers, then press <Enter> to search",
       "default": "<Default>",
       "defaultTip": "Search only allowed sites",
       "all": "<All Sites>",
-      "noSearchSolution": "No Search Solution, please add",
-      "noAllowSearchSites": "The site that allows search is not configured yet. Please configure it first.",
+      "noSearchSolution": "No Search Solution, please add a solution",
+      "noAllowSearchSites": "The site to search is not configured yet. Please configure it before.",
       "searchThisKey": "Search “{key}”",
-      "doubanTip": "The above data comes from the Douban Movie API v2 query interface; if you do not want to display these results for pre-selection, you can close it in the General Settings",
+      "doubanTip": "The above data comes from the Douban Movie API v2 ; if you do not want to display these results for pre-selection, you can close it in the General Settings",
       "toDouban": "View in Douban"
     },
     "donate": {
@@ -100,7 +100,7 @@
       "clear": "Clear",
       "removeConfirm": "Are you sure you want to delete this record?",
       "removeConfirmTitle": "Delete confirmation",
-      "clearConfirm": "Are you sure you want to delete all downloads?",
+      "clearConfirm": "Are you sure you want to delete all download records?",
       "ok": "@:(common.ok)",
       "cancel": "@:(common.cancel)",
       "download": "Download again",
@@ -108,7 +108,7 @@
       "success": "Success",
       "unknown": "N/A",
       "defaultPath": "Default directory",
-      "seedingTorrent": "Sending torrent to download server...",
+      "seedingTorrent": "Sending torrents to download server...",
       "headers": {
         "site": "Source",
         "title": "Title",
@@ -130,7 +130,7 @@
       "settings": "Settings",
       "statistic": "Statistic",
       "newMessage": "New message",
-      "startGetting": "Getting...",
+      "startGetting": "Getting data...",
       "gettingForSite": "Getting {siteName} data",
       "requestCompleted": "Request completed, time: {second} seconds.",
       "getUserInfoError": "An error occurred",
@@ -166,28 +166,28 @@
       "thanks": "The birth of PT Plugin Plus is based on these projects. Thanks to all the participants of the project, thank you for their contribution!",
       "headers": {
         "name": "Name",
-        "ver": "Ver",
+        "ver": "Version",
         "url": "URL"
       }
     },
     "team": {
       "title": "Alphabetical Order",
       "contributors": "Contributors:",
-      "issues": "Users:"
+      "issues": "Suggesters:"
     },
     "timeline": {
       "share": "Generate a share image",
-      "siteName": "Site name",
+      "siteName": "Tracker name",
       "userName": "User name",
       "userLevel": "User level",
       "close": "Close",
       "shareMessage": "Growth process",
       "total": {
-        "uploaded": "Total upload: ",
+        "uploaded": "Total uploads: ",
         "downloaded": "Total download: ",
         "seedingSize": "Seeding size: ",
         "ratio": "Total ratio: ",
-        "years": "Ｐ age：≈ {year} year(s)"
+        "years": "PT ages：≈ {year} year(s)"
       },
       "updateat": "Update at: ",
       "user": {
@@ -205,20 +205,20 @@
       "download": "Download",
       "downloadFailed": "Re-download failed",
       "sendToClient": "Send to server",
-      "sendToClientTip": "Send torrent to download server",
-      "save": "Save torrent file",
+      "sendToClientTip": "Send torrents to download server",
+      "save": "Save torrents",
       "searching": "Searching, please wait...",
       "cancelSearch": "Cancel search",
       "showCheckbox": "Multiple selection",
       "noTag": "No tag",
       "allSites": "All Sites",
-      "multiDownloadConfirm": "The number of torrents currently downloaded exceeds one, and the browser may prompt to save multiple times. Do you want to continue?",
-      "copyToClipboard": "Copy Link",
-      "copyToClipboardTip": "Copy download link to clipboard",
+      "multiDownloadConfirm": "The number of torrents currently downloaded exceeds one, and the browser may prompt multiple times to save. Do you want to continue?",
+      "copyToClipboard": "Copy Links",
+      "copyToClipboardTip": "Copy download links to clipboard",
       "reSearch": "Re-search",
       "showCategory": "Category",
       "filterSearchResults": "Filter search results",
-      "noResultsSites": "No results site:",
+      "noResultsSites": "Site with 0 result:",
       "failedSites": "Failed site:",
       "reSearchFailedSites": "Re-search failed site",
       "failUrl": "Invalid link",
@@ -229,7 +229,7 @@
         "size": "Size",
         "seeders": "Seeders",
         "leechers": "Leechers",
-        "completed": "Completed",
+        "completed": "Completed/Snatched",
         "time": "Time(≈)",
         "action": "Action"
       },
@@ -585,7 +585,7 @@
       "seedingCount": "Seeding count",
       "size": "Size",
       "count": "Count",
-      "note": "Note: <br>1. Chart history data comes from the overview page, manual or automatic update will be recorded; <br>2. Each station only saves one per day;"
+      "note": "Note: <br>1. Chart history data comes from the overview page, manual or automatic update will be recorded; <br>2. Each tracker only saves one per day;"
     },
     "service": {
       "testClientConnectivityFailed": "Test client connection failed[{address}]",
