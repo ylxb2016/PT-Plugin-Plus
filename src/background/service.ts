@@ -45,7 +45,10 @@ export default class PTPlugin {
   private autoRefreshUserDataFailedCount: number = 0;
 
   constructor(localMode: boolean = false) {
-    this.initBrowserEvent();
+    if (!localMode) {
+      this.initBrowserEvent();
+    }
+
     this.logger.add({
       module: EModule.background,
       event: ELogEvent.init
@@ -227,6 +230,17 @@ export default class PTPlugin {
 
           // 如果没有特殊的情况默认使用处理器来处理
           default:
+            if ((this as any)[request.action]) {
+              (this as any)
+                [request.action](request.data, sender)
+                .then((result: any) => {
+                  resolve(result);
+                })
+                .catch((result: any) => {
+                  reject(result);
+                });
+              return;
+            }
             this.controller
               .call(request, sender)
               .then((result: any) => {
@@ -436,10 +450,13 @@ export default class PTPlugin {
     if (window.chrome === undefined) {
       return;
     }
+    if (!chrome.runtime) {
+      return;
+    }
+
     console.log("service.initBrowserEvent");
     // 监听由活动页面发来的消息事件
-    chrome.runtime &&
-      chrome.runtime.onMessage &&
+    chrome.runtime.onMessage &&
       chrome.runtime.onMessage.addListener(
         (message: any, sender: chrome.runtime.MessageSender, callback) => {
           this.requestMessage(message, sender)
@@ -453,6 +470,17 @@ export default class PTPlugin {
           return true;
         }
       );
+
+    // 当扩展程序第一次安装、更新至新版本或 Chrome 浏览器更新至新版本时产生。
+    chrome.runtime.onInstalled.addListener(details => {
+      console.log("chrome.runtime.onInstalled", details);
+      // 版本更新时
+      if (details.reason == "update") {
+        setTimeout(() => {
+          this.userData.upgrade();
+        }, 1000);
+      }
+    });
   }
 
   /**
@@ -544,5 +572,52 @@ export default class PTPlugin {
    */
   public clone(source: any) {
     return JSON.parse(JSON.stringify(source));
+  }
+
+  /**
+   * 检查权限
+   * @param permissions 需要检查的权限列表
+   */
+  public checkPermissions(permissions: string[]): Promise<any> {
+    return new Promise<any>((resolve?: any, reject?: any) => {
+      // 查询当前权限
+      chrome.permissions.contains(
+        {
+          permissions: permissions
+        },
+        result => {
+          if (result === true) {
+            resolve(true);
+          } else {
+            reject({
+              success: false
+            });
+          }
+        }
+      );
+    });
+  }
+
+  /**
+   * 申请权限
+   * @param permissions 需要申请的权限列表
+   */
+  public requestPermissions(permissions: string[]): Promise<any> {
+    return new Promise<any>((resolve?: any, reject?: any) => {
+      chrome.permissions.request(
+        {
+          permissions: permissions
+        },
+        granted => {
+          if (granted === true) {
+            resolve(true);
+          } else {
+            reject({
+              success: false
+            });
+          }
+        }
+      );
+    });
   }
 }

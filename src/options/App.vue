@@ -1,15 +1,19 @@
 <template>
   <v-app id="inspire">
-    <v-alert :value="!$store.state.initialized" type="error">配置信息加载失败，没有获取到系统定义信息，请尝试刷新当前页面</v-alert>
-    <template v-if="$store.state.initialized">
-      <!-- 导航栏 -->
-      <Navigation v-model="drawer"></Navigation>
-      <!-- 顶部工具条 -->
-      <Topbar v-model="drawer"></Topbar>
-      <!-- 内容显示区域 -->
-      <Content/>
-      <!-- 页脚 -->
-      <Footer/>
+    <v-alert :value="initializing" type="info">{{ words.initializing }}</v-alert>
+    <template v-if="!initializing">
+      <v-alert :value="!$store.state.initialized" type="error">{{ words.error }}</v-alert>
+      <template v-if="$store.state.initialized && havePermissions">
+        <!-- 导航栏 -->
+        <Navigation v-model="drawer"></Navigation>
+        <!-- 顶部工具条 -->
+        <Topbar v-model="drawer"></Topbar>
+        <!-- 内容显示区域 -->
+        <Content/>
+        <!-- 页脚 -->
+        <Footer/>
+      </template>
+      <Permissions v-else @update="reload"/>
     </template>
   </v-app>
 </template>
@@ -20,19 +24,45 @@ import Navigation from "./components/Navigation.vue";
 import Topbar from "./components/Topbar.vue";
 import Footer from "./components/Footer.vue";
 import Content from "./components/Content.vue";
+import Permissions from "./components/Permissions";
 export default {
   name: "App",
   components: {
     Navigation,
     Topbar,
     Footer,
-    Content
+    Content,
+    Permissions
   },
   data() {
     return {
+      words: {
+        error: "配置信息加载失败，没有获取到系统定义信息，请尝试刷新当前页面",
+        initializing: "程序正在准备一些数据，请稍候……"
+      },
       baseColor: "amber",
-      drawer: this.$store.state.options.navBarIsOpen
+      drawer: this.$store.state.options.navBarIsOpen,
+      havePermissions: false,
+      initializing: true
     };
+  },
+  created() {
+    if (chrome && chrome.permissions) {
+      // 查询当前权限
+      chrome.permissions.contains(
+        {
+          permissions: ["tabs"],
+          origins: ["*://*/*"]
+        },
+        result => {
+          this.havePermissions = result;
+          this.initializing = false;
+        }
+      );
+    } else {
+      this.havePermissions = false;
+      this.initializing = false;
+    }
   },
   watch: {
     drawer() {
@@ -41,6 +71,11 @@ export default {
           navBarIsOpen: this.drawer
         });
       }
+    }
+  },
+  methods: {
+    reload(havePermissions) {
+      this.havePermissions = havePermissions;
     }
   }
 };

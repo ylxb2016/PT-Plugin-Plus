@@ -67,6 +67,9 @@ export default class Controller {
     this.searcher.options = options;
     this.initDefaultClient();
     this.siteDefaultClients = {};
+    if (options.connectClientTimeout) {
+      this.movieInfoService.timeout = options.connectClientTimeout;
+    }
   }
 
   /**
@@ -857,5 +860,50 @@ export default class Controller {
    */
   public getIMDbIdFromDouban(doubanId: number): Promise<any> {
     return this.movieInfoService.getIMDbIdFromDouban(doubanId);
+  }
+
+  /**
+   * 从豆瓣查询影片信息
+   * @param key 需要查询的关键字
+   * @param count 要显示的条目数量
+   */
+  public queryMovieInfoFromDouban(options: any): Promise<any> {
+    return this.movieInfoService.queryMovieInfoFromDouban(
+      options.key,
+      options.count
+    );
+  }
+
+  /**
+   * 添加浏览器原生下载请求
+   * @param options
+   */
+  public addBrowserDownloads(options: any): Promise<any> {
+    return new Promise<any>((resolve?: any, reject?: any) => {
+      this.service
+        .checkPermissions(["downloads"])
+        .then(() => {
+          let items = [];
+          if (Array.isArray(options)) {
+            items = options;
+          } else {
+            items.push(options);
+          }
+
+          items.forEach(item => {
+            chrome.downloads.download(item, function(downloadId) {
+              console.log(downloadId);
+            });
+          });
+
+          resolve(items.length);
+        })
+        .catch(() => {
+          reject({
+            success: false,
+            msg: "无权限，请前往用户授权"
+          });
+        });
+    });
   }
 }

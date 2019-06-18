@@ -134,7 +134,15 @@ export enum EAction {
   // 获取电影评分信息
   getMovieRatings = "getMovieRatings",
   // 根据指定的 doubanId 获取 IMDbId
-  getIMDbIdFromDouban = "getIMDbIdFromDouban"
+  getIMDbIdFromDouban = "getIMDbIdFromDouban",
+  // 从豆瓣查询影片信息
+  queryMovieInfoFromDouban = "queryMovieInfoFromDouban",
+  // 添加浏览器原生下载
+  addBrowserDownloads = "addBrowserDownloads",
+  // 验证权限
+  checkPermissions = "checkPermissions",
+  // 请求用户授权
+  requestPermissions = "requestPermissions"
 }
 
 /**
